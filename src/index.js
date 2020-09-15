@@ -1,5 +1,7 @@
-import store from './store';
-import * as actions from './actionCreators';
+import configureStore from './store/configureStore';
+import * as actions from './store/bugs';
+
+const store = configureStore();
 
 store.subscribe(() => {
     console.log('state chaged');

@@ -1,10 +1,40 @@
-import * as actions from './actionTypes';
-let lastID = 0;
+// aCTIONS SECTION
+const BUG_ADD = 'bugAdd';
+const BUG_REMOVE = 'bugRemove';
+const BUG_RESOLVE = 'bugResolve';
 
+
+
+// ACTION CREATORS SECTION
+export const bugAdd = description => ({
+    type: BUG_ADD,
+    payload: {
+        description: description
+    }
+});
+
+export const bugRemove = id => ({
+    type: BUG_REMOVE,
+    payload: {
+        id
+    }
+});
+
+export const bugResolve = id => ({
+    type: BUG_RESOLVE,
+    payload: {
+        id
+    }
+});
+
+
+
+// REDUCER SECTION 
+let lastID = 0;
 export default function reducer(state = [], action) {
 
     switch (action.type) {
-        case actions.BUG_ADD:
+        case BUG_ADD:
             return [
                 ...state,
                 {
@@ -13,16 +43,10 @@ export default function reducer(state = [], action) {
                     resolved: false
                 }
             ];
-        case actions.BUG_REMOVE:
+        case BUG_REMOVE:
             return state.filter(bug => bug.id !== action.payload.id);
-        case actions.BUG_RESOLVE:
+        case BUG_RESOLVE:
             
-            // const bugs = [...state];
-            // const index = state.findIndex(bug => bug.id === action.payload.id);
-            // bugs[index] = {...bugs[index]};
-            // bugs[index].resolved = true;
-            // return bugs;
-
             return state.map(bug => 
                 bug.id !== action.payload.id ? bug : { ...bug, resolved: true }    
             );
