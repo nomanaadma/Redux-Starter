@@ -1,26 +1,23 @@
 import configureStore from './store/configureStore';
-import { bugAdd, bugResolve, getUnresolvedBugs } from './store/bugs';
+import { bugAdd, bugResolve, getUnresolvedBugs, bugAssignToUser, getBugsByUser } from './store/bugs';
 import { projectAdded } from './store/projects';
+import { userAdded } from './store/users';
 
 const store = configureStore();
-console.log(store);
 
 
+store.subscribe(() => {
+    console.log('state chaged');
+});
+    
 store.dispatch(projectAdded({ name: "Project 1"}));
-
-
-// store.subscribe(() => {
-//     console.log('state chaged');
-// });
-
 store.dispatch(bugAdd({ description: "Bug 1"}));
 store.dispatch(bugAdd({ description: "Bug 2"}));
 store.dispatch(bugAdd({ description: "Bug 3"}));
 store.dispatch(bugResolve({ id: 1 }));
+store.dispatch(userAdded({ name: "Noman"}));
+store.dispatch(userAdded({ name: "Amin"}));
+store.dispatch(bugAssignToUser({ bugId: 1, userId: 1 }));
 
-// console.log(store.getState());
-
-const x = getUnresolvedBugs(store.getState());
-const y = getUnresolvedBugs(store.getState());
-
-console.log(x, y, x === y);
+const bugs = getBugsByUser(2)(store.getState());
+console.log(bugs);
