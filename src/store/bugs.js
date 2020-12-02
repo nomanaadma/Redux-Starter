@@ -73,7 +73,7 @@ export const loadbugs = () => (dispatch, getState) => {
 
 	if (diffInMinutes < 10) return;
 
-	dispatch(
+	return dispatch(
 		apiCallBegin({
 			url,
 			onStart: bugsRequested.type,

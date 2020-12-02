@@ -1,6 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { addbugs, getUnresolvedBugs, resolveBug } from '../bugs';
+import { addbugs, getUnresolvedBugs, resolveBug, loadbugs } from '../bugs';
 import configureStore from '../configureStore';
 
 describe('Bug Slice', () => {
@@ -20,6 +20,58 @@ describe('Bug Slice', () => {
 			}
 		}
 	});
+
+	describe("loading bugs", () => {
+		
+		describe("if the bugs exist in the cache", () => {
+			it("they should not be fetched from the server again.", async () => {
+				fakeAxios.onGet("/bugs").reply(200, [{ id: 1 }]);
+	
+				await store.dispatch(loadbugs());
+				await store.dispatch(loadbugs());
+	
+				expect(fakeAxios.history.get.length).toBe(1);
+			});
+		});
+	
+		describe("if the bugs don't exist in the cache", () => {
+			it("they should be fetched from the server and put in the store", async () => {
+				fakeAxios.onGet("/bugs").reply(200, [{ id: 1 }]);
+	
+				await store.dispatch(loadbugs());
+	
+				expect(bugSlice().list).toHaveLength(1);
+			});
+	
+			describe("loading indicator", () => {
+				it("should be true while fetching the bugs", () => {
+					fakeAxios.onGet("/bugs").reply(() => {
+						expect(bugSlice().loading).toBe(true);
+						return [200, [{ id: 1 }]];
+					});
+	
+					store.dispatch(loadbugs());
+				});
+	
+				it("should be false after the bugs are fetched", async () => {
+					fakeAxios.onGet("/bugs").reply(200, [{ id: 1 }]);
+	
+					await store.dispatch(loadbugs());
+	
+					expect(bugSlice().loading).toBe(false);
+				});
+	
+				it("should be false if the server returns an error", async () => {
+					fakeAxios.onGet("/bugs").reply(500);
+	
+					await store.dispatch(loadbugs());
+	
+					expect(bugSlice().loading).toBe(false);
+				});
+			});
+		});
+
+	});	
 
 	it("Should mark the bug as resolvd if it's saved to the server", async () => {
 
