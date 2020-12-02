@@ -4,18 +4,39 @@ import { addbugs } from '../bugs';
 import configureStore from '../configureStore';
 
 describe('Bug Slice', () => {
-	
-	it("Should Handle the addBug Action", async () => {
-		
+	let fakeAxios; 
+	let store;
+
+	beforeEach(() => {
+		fakeAxios = new MockAdapter(axios);
+		store = configureStore();
+	});
+
+	const bugSlice = () => store.getState().entities.bugs;
+
+	it("Should add the bug to the store if its saved to the server", async () => {
+		// Arrage
 		const bug = { description: 'a'};
 		const saveBug = { ...bug, id: 1 };
-
-		const fakeAxios = new MockAdapter(axios);
 		fakeAxios.onPost('/bugs').reply(200, saveBug);
 
-		const store = configureStore();
+		// Act
 		await store.dispatch(addbugs(bug));
-		expect(store.getState().entities.bugs.list).toContainEqual(saveBug);
+
+		// Assert
+		expect(bugSlice().list).toContainEqual(saveBug);
+	});
+
+	it("Should not add the bug to the store if its not saved to the server", async () => {
+		// Arrage
+		const bug = { description: 'a'};
+		fakeAxios.onPost('/bugs').reply(500);
+
+		// Act
+		await store.dispatch(addbugs(bug));
+
+		// Assert
+		expect(bugSlice().list).toHaveLength(0);
 	});
 
 });
