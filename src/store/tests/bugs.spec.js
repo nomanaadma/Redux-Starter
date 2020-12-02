@@ -1,25 +1,16 @@
-import { addbugs, bugAdd } from '../bugs';
-import { apiCallBegin } from '../api';
+import { addbugs } from '../bugs';
+import configureStore from '../configureStore';
 
 describe('Bug Slice', () => {
-	describe('Action Creators', () => {
-		it('addBug', () => {
-			const bug = { description: 'a' };
-			const result = addbugs(bug);
-			const expected = {
-				type: apiCallBegin.type,
-				payload: {
-					url: '/bugs',
-					method: 'post',
-					data: bug,
-					onSuccess: bugAdd.type
-				}
-			}
+	
+	it("Should Handle the addBug Action", async () => {
 
-			expect(result).toEqual(expected);
-
-		});
+		const store = configureStore();
+		const bug = { description: 'a'};
+		await store.dispatch(addbugs(bug));
+		expect(store.getState().entities.bugs.list).toHaveLength(1);
 	});
+
 });
 
 
