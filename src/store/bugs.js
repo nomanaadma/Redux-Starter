@@ -3,8 +3,6 @@ import { createSelector } from 'reselect';
 import { apiCallBegin } from './api';
 import moment from 'moment';
 
-let lastID = 0;
-
 const slice = createSlice({
     name: 'bugs',
     initialState: {
@@ -37,11 +35,7 @@ const slice = createSlice({
         },
         
         bugAdd: (bugs, action) => {
-            bugs.list.push({
-                id: ++lastID,
-                description: action.payload.description,
-                resolved: false
-            });
+            bugs.list.push(action.payload);
         },
         
         bugResolve: (bugs, action) => {
@@ -58,6 +52,15 @@ export default slice.reducer;
 
 // Action Creator
 const url = "/bugs";
+
+
+export const addbugs = bug => apiCallBegin({
+	url,
+	method: 'post',
+	data: bug,
+	onSuccess: bugAdd.type,
+});
+
 
 export const loadbugs = () => (dispatch, getState) => {
 
